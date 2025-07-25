@@ -13,7 +13,7 @@ const JWT_SECRET = '113fad8deec90d2767ae4fc4ddbc490e'; // IMPORTANT: Change this
 
 // ===== Middleware =====
 app.use(cors({
-  origin: "https://your-frontend-url.com" // Replace with your actual frontend URL later
+  origin: "https://modelling-site.vercel.app" // Replace with your actual frontend URL later
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
