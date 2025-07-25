@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = 5000;
-const JWT_SECRET = 'your_super_strong_jwt_secret_key'; // IMPORTANT: Change this!
+const JWT_SECRET = '113fad8deec90d2767ae4fc4ddbc490e'; // IMPORTANT: Change this!
 
 // ===== Middleware =====
 app.use(cors({
