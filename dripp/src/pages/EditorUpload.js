@@ -48,7 +48,7 @@ const EditorUpload = () => {
     formData.append('video', videoFile);
 
     try {
-      const res = await fetch('http://localhost:5000/api/editor/upload', {
+      const res = await fetch('https://modelconnect-api.onrender.com/api/editor/upload', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

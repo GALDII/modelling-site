@@ -25,7 +25,7 @@ const PublicProfile = () => {
 
             try {
                 // CORRECTED: Added the Authorization header to the fetch request
-                const res = await fetch(`http://localhost:5000/api/profile/${userId}`, {
+                const res = await fetch(`https://modelconnect-api.onrender.com/api/profile/${userId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -92,7 +92,7 @@ const PublicProfile = () => {
                 <div className="md:flex gap-8 items-center bg-white p-8 rounded-2xl shadow-lg">
                     <div className="md:w-1/3 text-center md:text-left">
                         <img 
-                            src={`http://localhost:5000/uploads/${profile.image}`}
+                            src={`https://modelconnect-api.onrender.com/uploads/${profile.image}`}
                             alt={profile.name}
                             className={`w-48 h-48 rounded-full mx-auto object-cover ring-4 ${isPhotographer ? 'ring-blue-200' : 'ring-pink-200'}`}
                         />
@@ -126,7 +126,7 @@ const PublicProfile = () => {
                     <div className="mt-12 bg-white p-8 rounded-2xl shadow-lg">
                         <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3"><Video size={28}/> Sample Work</h2>
                         <div className="rounded-xl overflow-hidden shadow-inner">
-                            <video src={`http://localhost:5000/uploads/${profile.sample_video_url}`} controls className="w-full"></video>
+                            <video src={`https://modelconnect-api.onrender.com/uploads/${profile.sample_video_url}`} controls className="w-full"></video>
                         </div>
                     </div>
                 )}
@@ -144,7 +144,7 @@ const PublicProfile = () => {
                                     transition={{ type: 'spring', stiffness: 300 }}
                                 >
                                     <img 
-                                        src={`http://localhost:5000/uploads/${img.image_url}`}
+                                        src={`https://modelconnect-api.onrender.com/uploads/${img.image_url}`}
                                         alt={`Gallery image for ${profile.name}`}
                                         className="w-full h-full object-cover"
                                     />

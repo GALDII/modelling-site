@@ -19,7 +19,7 @@ const AdminDashboard = () => {
             }
             try {
                 // This endpoint needs to exist on your server and be protected for admins
-                const response = await fetch('http://localhost:5000/api/users', {
+                const response = await fetch('https://modelconnect-api.onrender.com/api/users', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

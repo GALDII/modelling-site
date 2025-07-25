@@ -69,7 +69,7 @@ const PhotographerUpload = () => {
     formData.append('role', user.role);
 
     try {
-      const res = await fetch('http://localhost:5000/api/models', {
+      const res = await fetch('https://modelconnect-api.onrender.com/api/models', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

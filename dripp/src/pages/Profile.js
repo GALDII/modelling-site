@@ -20,7 +20,7 @@ const EditorDashboard = ({ videos, fetchVideos, showNotification }) => {
     const handleDelete = async (videoId) => {
         if (window.confirm('Are you sure you want to delete this video? This action cannot be undone.')) {
             try {
-                const res = await fetch(`http://localhost:5000/api/editor/videos/${videoId}`, {
+                const res = await fetch(`https://modelconnect-api.onrender.com/api/editor/videos/${videoId}`, {
                     method: 'DELETE',
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -48,7 +48,7 @@ const EditorDashboard = ({ videos, fetchVideos, showNotification }) => {
                 <motion.div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     {videos.map(video => (
                         <motion.div key={video.id} className="bg-white rounded-xl shadow-lg overflow-hidden border" layout initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring' }}>
-                            <div className="relative aspect-video bg-black"><video src={`http://localhost:5000/uploads/${video.video_url}`} controls className="w-full h-full object-cover"></video></div>
+                            <div className="relative aspect-video bg-black"><video src={`https://modelconnect-api.onrender.com/uploads/${video.video_url}`} controls className="w-full h-full object-cover"></video></div>
                             <div className="p-5">
                                 <h3 className="text-xl font-bold text-gray-900 truncate">{video.title}</h3>
                                 <p className="text-gray-600 text-sm mt-1 h-10 overflow-hidden">{video.description}</p>
@@ -95,7 +95,7 @@ const CreativeProfile = ({ profile, fetchProfile, showNotification }) => {
     };
     const handleDeleteExistingImage = async (imageId) => {
         try {
-          const res = await fetch(`http://localhost:5000/api/models/my-profile/gallery/${imageId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+          const res = await fetch(`https://modelconnect-api.onrender.com/api/models/my-profile/gallery/${imageId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
           const data = await res.json();
           if (!res.ok) throw new Error(data.message);
           showNotification('Image deleted!', 'success');
@@ -106,7 +106,7 @@ const CreativeProfile = ({ profile, fetchProfile, showNotification }) => {
     };
     const handleSetMainImage = async (imageUrl) => {
         try {
-          const res = await fetch('http://localhost:5000/api/models/my-profile/main-image', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`}, body: JSON.stringify({ imageUrl }) });
+          const res = await fetch('https://modelconnect-api.onrender.com/api/models/my-profile/main-image', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`}, body: JSON.stringify({ imageUrl }) });
           const data = await res.json();
           if (!res.ok) throw new Error(data.message);
           showNotification('Main image updated!', 'success');
@@ -122,10 +122,10 @@ const CreativeProfile = ({ profile, fetchProfile, showNotification }) => {
             if (galleryFiles.length > 0) {
                 const galleryUploadForm = new FormData();
                 galleryFiles.forEach(file => galleryUploadForm.append('galleryImages', file));
-                const galleryRes = await fetch('http://localhost:5000/api/models/my-profile/gallery', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: galleryUploadForm });
+                const galleryRes = await fetch('https://modelconnect-api.onrender.com/api/models/my-profile/gallery', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: galleryUploadForm });
                 if (!galleryRes.ok) throw new Error((await galleryRes.json()).message);
             }
-            const detailsRes = await fetch('http://localhost:5000/api/models/my-profile', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(formData) });
+            const detailsRes = await fetch('https://modelconnect-api.onrender.com/api/models/my-profile', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(formData) });
             if (!detailsRes.ok) throw new Error((await detailsRes.json()).message);
             showNotification('Profile saved successfully!', 'success');
             setIsEditing(false);
@@ -142,7 +142,7 @@ const CreativeProfile = ({ profile, fetchProfile, showNotification }) => {
     return (
         <form onSubmit={handleSave}>
             <div className="relative h-48 bg-gradient-to-r from-pink-50 to-rose-100">
-                <div className="absolute -bottom-16 left-8"><div className="w-32 h-32 rounded-full ring-4 ring-white bg-gray-200 flex items-center justify-center overflow-hidden"><img src={`http://localhost:5000/uploads/${profile.image}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://placehold.co/128x128/e2e8f0/4a5568?text=N/A'; }} /></div></div>
+                <div className="absolute -bottom-16 left-8"><div className="w-32 h-32 rounded-full ring-4 ring-white bg-gray-200 flex items-center justify-center overflow-hidden"><img src={`https://modelconnect-api.onrender.com/uploads/${profile.image}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://placehold.co/128x128/e2e8f0/4a5568?text=N/A'; }} /></div></div>
                 <div className="absolute top-4 right-4">{!isEditing ? (<button type="button" onClick={handleEdit} className="flex items-center gap-2 bg-white text-gray-700 px-4 py-2 rounded-lg font-semibold shadow hover:bg-gray-100 transition"><Edit size={16} /> Edit Profile</button>) : (<div className="flex gap-2"><button type="submit" disabled={isSubmitting} className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-green-600 transition disabled:bg-green-300">{isSubmitting ? <Loader className="animate-spin" size={16}/> : <Save size={16}/>} Save</button><button type="button" onClick={handleCancel} className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-gray-600 transition"><X size={16} /> Cancel</button></div>)}</div>
             </div>
             <div className="pt-20 p-8 space-y-8">
@@ -170,14 +170,14 @@ const CreativeProfile = ({ profile, fetchProfile, showNotification }) => {
                         {profile.role === 'photographer' && profile.sample_video_url && (
                             <>
                                 <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Sample Video</h3>
-                                <div className="rounded-lg overflow-hidden"><video src={`http://localhost:5000/uploads/${profile.sample_video_url}`} controls className="w-full"></video></div>
+                                <div className="rounded-lg overflow-hidden"><video src={`https://modelconnect-api.onrender.com/uploads/${profile.sample_video_url}`} controls className="w-full"></video></div>
                             </>
                         )}
                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Photo Gallery</h3>
                         <div className="grid grid-cols-3 gap-2">
                           {profile.gallery.map((img) => (
                             <div key={img.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                               <img src={`http://localhost:5000/uploads/${img.image_url}`} alt={`Gallery`} className="w-full h-full object-cover"/>
+                               <img src={`https://modelconnect-api.onrender.com/uploads/${img.image_url}`} alt={`Gallery`} className="w-full h-full object-cover"/>
                                {profile.image === img.image_url && <div className="absolute top-1 left-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"><Star size={12}/> Main</div>}
                                {isEditing && (
                                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 p-1">
@@ -220,7 +220,7 @@ const Profile = () => {
   const fetchCreativeProfile = useCallback(async () => {
     if (!token) return;
     try {
-      const res = await fetch('http://localhost:5000/api/models/my-profile', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch('https://modelconnect-api.onrender.com/api/models/my-profile', { headers: { Authorization: `Bearer ${token}` } });
       if (res.status === 404) setProfile(null);
       else if (res.ok) setProfile(await res.json());
       else throw new Error('Could not fetch profile.');
@@ -230,7 +230,7 @@ const Profile = () => {
   const fetchEditorVideos = useCallback(async () => {
     if (!token) return;
     try {
-      const res = await fetch('http://localhost:5000/api/editor/my-videos', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch('https://modelconnect-api.onrender.com/api/editor/my-videos', { headers: { Authorization: `Bearer ${token}` } });
       if (res.ok) setEditorVideos(await res.json());
       else throw new Error('Could not fetch videos.');
     } catch (error) { showNotification(error.message, 'error'); }
