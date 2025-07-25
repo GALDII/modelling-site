@@ -25,7 +25,12 @@ const db = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  ssl: { "rejectUnauthorized": true } // Often required by cloud databases
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  ssl: {
+    rejectUnauthorized: false // Add this line
+  }
 });
 
 // Test DB connection
