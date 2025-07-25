@@ -12,20 +12,20 @@ const PORT = 5000;
 const JWT_SECRET = 'your_super_strong_jwt_secret_key'; // IMPORTANT: Change this!
 
 // ===== Middleware =====
-app.use(cors());
+app.use(cors({
+  origin: "https://your-frontend-url.com" // Replace with your actual frontend URL later
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 
 // ===== MySQL Connection Pool =====
 const db = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'modelconnect',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  ssl: { "rejectUnauthorized": true } // Often required by cloud databases
 });
 
 // Test DB connection
