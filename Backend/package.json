@@ -1,13 +1,15 @@
 {
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
+    "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.14.2"
   },
   "scripts": {
-  "start": "node server.js"
-}
+    "start": "node server.js"
+  }
 }
