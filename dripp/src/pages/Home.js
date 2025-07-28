@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ArrowRight, TrendingUp, ShieldCheck, Award, AlertTriangle } from 'lucide-react';
+import { useAuth } from '../Context/AuthContext'; // CORRECT: Import your actual useAuth hook
 
 // --- Placeholder for your actual API and Auth logic ---
-// In your real application, these would be imported from their respective files.
 const API_BASE_URL = 'https://modelconnect-api.onrender.com';
-const useAuth = () => ({ token: 'your-jwt-token-goes-here' });
+// The placeholder useAuth hook has been removed. We are now importing the real one above.
 // ----------------------------------------------------
+
 
 // Animation variants for Framer Motion
 const sectionVariant = {
@@ -38,7 +39,7 @@ const Home = () => {
   const [featuredModels, setFeaturedModels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { token } = useAuth();
+  const { token } = useAuth(); // This will now use the REAL token from your logged-in session
 
   useEffect(() => {
     const loadFeaturedModels = async () => {
@@ -56,7 +57,8 @@ const Home = () => {
         });
 
         if (!res.ok) {
-          throw new Error('Failed to fetch data from the server.');
+          const errorData = await res.json().catch(() => ({ message: 'Failed to fetch data from the server.' }));
+          throw new Error(errorData.message);
         }
 
         const data = await res.json();
@@ -156,7 +158,6 @@ const Home = () => {
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-12">Get Started in 3 Easy Steps</h2>
           <div className="grid md:grid-cols-3 gap-10 relative">
-            {/* Dashed line for desktop */}
             <div className="hidden md:block absolute top-1/2 left-0 w-full h-px bg-gray-300 border-t-2 border-dashed -translate-y-12"></div>
             <div className="relative z-10">
               <div className="bg-pink-500 text-white w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-4">1</div>
@@ -197,7 +198,7 @@ const Home = () => {
         )}
 
         {error && (
-          <div className="text-center py-10 bg-red-50 border border-red-200 rounded-lg">
+          <div className="text-center py-10 my-8 bg-red-50 border border-red-200 rounded-lg max-w-2xl mx-auto">
             <AlertTriangle className="mx-auto text-red-500" size={40} />
             <p className="mt-4 text-red-700 font-semibold">{error}</p>
           </div>
