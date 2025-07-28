@@ -6,16 +6,14 @@ const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-require('dotenv').config(); // Make sure dotenv is configured at the top
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET || 'your_super_strong_jwt_secret_key';
+const PORT = 5000;
+const JWT_SECRET = '113fad8deec90d2767ae4fc4ddbc490e'; // IMPORTANT: Change this!
 
 // ===== Middleware =====
-// CORRECTED: Configure CORS to accept requests from your live frontend URL
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000"
+  origin: "https://modelling-site.vercel.app" // Replace with your actual frontend URL later
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -23,16 +21,17 @@ app.use('/uploads', express.static('uploads'));
 
 // ===== MySQL Connection Pool =====
 const db = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'modelconnect',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  ssl: {
+    rejectUnauthorized: false // Add this line
+  }
 });
-
-// ... (The rest of your server.js code remains exactly the same) ...
 
 // Test DB connection
 db.getConnection()
@@ -53,11 +52,13 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`)
 });
 
+// Generic uploader for mixed file types
 const fileUploader = multer({
     storage: storage,
     limits: { fileSize: 50 * 1024 * 1024 }, // Use larger limit
 });
 
+// Video-only uploader
 const videoUpload = multer({
     storage: storage,
     limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
@@ -67,6 +68,7 @@ const videoUpload = multer({
     }
 });
 
+// Image-only uploader
 const imageUpload = multer({ 
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
@@ -183,42 +185,69 @@ app.get('/api/editors/videos', verifyToken, restrictTo('recruiter', 'admin'), as
 
 
 // ===== PROFILE ROUTES =====
-app.post('/api/models', verifyToken, fileUploader.fields([{ name: 'mainImage', maxCount: 1 }, { name: 'galleryImages', maxCount: 8 }, { name: 'sampleVideo', maxCount: 1 }]), async (req, res) => {
-    const { name, gender, bio, portfolio, instagram_id, role } = req.body;
-    const user_id = req.user.id;
-    const mainImageFile = req.files.mainImage ? req.files.mainImage[0] : null;
-    const sampleVideoFile = req.files.sampleVideo ? req.files.sampleVideo[0] : null;
-    const galleryImageFiles = req.files.galleryImages || [];
 
-    if (!mainImageFile || !mainImageFile.mimetype.startsWith('image/')) return res.status(400).json({ message: 'A valid main profile image is required.' });
-    if (sampleVideoFile && !sampleVideoFile.mimetype.startsWith('video/')) return res.status(400).json({ message: 'The sample work must be a valid video file.' });
-    if (['model', 'photographer'].includes(role) && galleryImageFiles.length < 4) return res.status(400).json({ message: 'A minimum of 4 gallery images are required at signup.' });
-    if (!name || !gender || !bio) return res.status(400).json({ message: 'Name, gender, and bio are required.' });
+// CORRECTED: Create initial model/photographer profile
+app.post(
+    '/api/models', 
+    verifyToken, 
+    fileUploader.fields([
+        { name: 'mainImage', maxCount: 1 },
+        { name: 'galleryImages', maxCount: 8 },
+        { name: 'sampleVideo', maxCount: 1 }
+    ]), 
+    async (req, res) => {
+        const { name, gender, bio, portfolio, instagram_id, role } = req.body;
+        const user_id = req.user.id;
 
-    const mainImage = mainImageFile.filename;
-    const sampleVideo = sampleVideoFile ? sampleVideoFile.filename : null;
-    
-    const connection = await db.getConnection();
-    try {
-        await connection.beginTransaction();
-        const [result] = await connection.query('INSERT INTO models (name, gender, bio, portfolio, instagram_id, image, sample_video_url, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [name, gender, bio, portfolio, instagram_id, mainImage, sampleVideo, user_id]);
-        const modelId = result.insertId;
-        const allImageFiles = [mainImageFile, ...galleryImageFiles];
-        const galleryValues = allImageFiles.map(file => [modelId, file.filename]);
-        if (galleryValues.length > 0) {
-            await connection.query('INSERT INTO model_images (model_id, image_url) VALUES ?', [galleryValues]);
+        const mainImageFile = req.files.mainImage ? req.files.mainImage[0] : null;
+        const sampleVideoFile = req.files.sampleVideo ? req.files.sampleVideo[0] : null;
+        const galleryImageFiles = req.files.galleryImages || [];
+
+        // Validation
+        if (!mainImageFile || !mainImageFile.mimetype.startsWith('image/')) {
+            return res.status(400).json({ message: 'A valid main profile image is required.' });
         }
-        await connection.commit();
-        res.status(201).json({ message: 'Profile created successfully!' });
-    } catch (error) {
-        await connection.rollback();
-        console.error(error);
-        res.status(500).json({ message: 'Failed to create profile.' });
-    } finally {
-        connection.release();
-    }
-});
+        if (sampleVideoFile && !sampleVideoFile.mimetype.startsWith('video/')) {
+            return res.status(400).json({ message: 'The sample work must be a valid video file.' });
+        }
+        if (['model', 'photographer'].includes(role) && galleryImageFiles.length < 4) {
+            return res.status(400).json({ message: 'A minimum of 4 gallery images are required at signup.' });
+        }
+        if (!name || !gender || !bio) {
+            return res.status(400).json({ message: 'Name, gender, and bio are required.' });
+        }
 
+        const mainImage = mainImageFile.filename;
+        const sampleVideo = sampleVideoFile ? sampleVideoFile.filename : null;
+        
+        const connection = await db.getConnection();
+        try {
+            await connection.beginTransaction();
+            const [result] = await connection.query(
+                'INSERT INTO models (name, gender, bio, portfolio, instagram_id, image, sample_video_url, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [name, gender, bio, portfolio, instagram_id, mainImage, sampleVideo, user_id]
+            );
+            const modelId = result.insertId;
+
+            // Add all uploaded images to the gallery. The frontend sends the main image as the first image in the gallery array.
+            const galleryValues = galleryImageFiles.map(file => [modelId, file.filename]);
+            if (galleryValues.length > 0) {
+                 await connection.query('INSERT INTO model_images (model_id, image_url) VALUES ?', [galleryValues]);
+            }
+            
+            await connection.commit();
+            res.status(201).json({ message: 'Profile created successfully!' });
+        } catch (error) {
+            await connection.rollback();
+            console.error(error);
+            res.status(500).json({ message: 'Failed to create profile.' });
+        } finally {
+            connection.release();
+        }
+    }
+);
+
+// Fetch the logged-in user's own profile
 app.get('/api/models/my-profile', verifyToken, async (req, res) => {
     try {
         const [profileRows] = await db.query('SELECT * FROM models WHERE user_id = ?', [req.user.id]);
@@ -233,6 +262,7 @@ app.get('/api/models/my-profile', verifyToken, async (req, res) => {
     }
 });
 
+// Update profile TEXT details
 app.put('/api/models/my-profile', verifyToken, async (req, res) => {
     try {
         const { name, gender, bio, portfolio, instagram_id } = req.body;
@@ -244,6 +274,7 @@ app.put('/api/models/my-profile', verifyToken, async (req, res) => {
     }
 });
 
+// Upload NEW gallery images
 app.post('/api/models/my-profile/gallery', verifyToken, imageUpload.array('galleryImages', 8), async (req, res) => {
     const connection = await db.getConnection();
     try {
@@ -275,6 +306,7 @@ app.post('/api/models/my-profile/gallery', verifyToken, imageUpload.array('galle
     }
 });
 
+// Set an existing gallery image as the main profile image
 app.put('/api/models/my-profile/main-image', verifyToken, async (req, res) => {
     try {
         const { imageUrl } = req.body;
@@ -292,6 +324,7 @@ app.put('/api/models/my-profile/main-image', verifyToken, async (req, res) => {
     }
 });
 
+// Delete an image from the gallery
 app.delete('/api/models/my-profile/gallery/:imageId', verifyToken, async (req, res) => {
     const connection = await db.getConnection();
     try {
@@ -322,17 +355,26 @@ app.delete('/api/models/my-profile/gallery/:imageId', verifyToken, async (req, r
     }
 });
 
+// Fetch a specific public profile by user_id
 app.get('/api/profile/:userId', verifyToken, async (req, res) => {
     try {
         const { userId } = req.params;
-        const query = `SELECT m.*, u.role FROM models m JOIN users u ON m.user_id = u.id WHERE m.user_id = ?`;
+        const query = `
+            SELECT m.*, u.role 
+            FROM models m 
+            JOIN users u ON m.user_id = u.id 
+            WHERE m.user_id = ?
+        `;
         const [profileRows] = await db.query(query, [userId]);
+
         if (profileRows.length === 0) {
             return res.status(404).json({ message: 'Profile not found.' });
         }
         const profile = profileRows[0];
+
         const [galleryRows] = await db.query('SELECT id, image_url FROM model_images WHERE model_id = ?', [profile.id]);
         profile.gallery = galleryRows;
+
         res.json(profile);
     } catch (error) {
         console.error(error);
