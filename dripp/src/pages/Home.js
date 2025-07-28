@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Camera, UserCheck, Star, ArrowRight, TrendingUp, ShieldCheck, Award, MapPin } from 'lucide-react';
+import { Star, ArrowRight, TrendingUp, ShieldCheck, Award, AlertTriangle } from 'lucide-react';
+
+// --- Placeholder for your actual API and Auth logic ---
+// In your real application, these would be imported from their respective files.
+const API_BASE_URL = 'https://modelconnect-api.onrender.com';
+const useAuth = () => ({ token: 'your-jwt-token-goes-here' });
+// ----------------------------------------------------
 
 // Animation variants for Framer Motion
 const sectionVariant = {
@@ -11,7 +17,8 @@ const sectionVariant = {
     y: 0,
     transition: { 
       duration: 0.6,
-      ease: "easeOut" 
+      ease: "easeOut",
+      staggerChildren: 0.2
     }
   }
 };
@@ -28,25 +35,48 @@ const cardVariant = {
 };
 
 const Home = () => {
-  // Updated mock data with more professional model images
-  const featuredModels = [
-    { name: 'Alexina', imageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80' },
-    { name: 'Ricardo', imageUrl: 'https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?auto=format&fit=crop&w=400&q=80' },
-    { name: 'Chloe', imageUrl: 'https://images.unsplash.com/photo-1617922001434-c7a435bd8587?auto=format&fit=crop&w=400&q=80' },
-  ];
+  const [featuredModels, setFeaturedModels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { token } = useAuth();
+
+  useEffect(() => {
+    const loadFeaturedModels = async () => {
+      if (!token) {
+        setError("Authentication is required to view models.");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/models`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch data from the server.');
+        }
+
+        const data = await res.json();
+        const modelsOnly = data.filter(p => p.role === 'model');
+        setFeaturedModels(modelsOnly.slice(0, 3)); // Take the first 3 models
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFeaturedModels();
+  }, [token]);
 
   const testimonials = [
     { quote: 'ModelConnect launched my career! I was discovered by a top agency within a month.', name: 'Elena', role: 'Fashion Model' },
     { quote: 'The best platform for finding fresh, diverse talent. The search tools are fantastic.', name: 'David Chen', role: 'Casting Director' },
   ];
   
-  const trendingLocations = [
-    { name: 'Paris', imageUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760c0337?auto=format&fit=crop&w=400&q=80' },
-    { name: 'New York', imageUrl: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=400&q=80' },
-    { name: 'Milan', imageUrl: 'https://images.unsplash.com/photo-1599599810703-76c273a5005b?auto=format&fit=crop&w=400&q=80' },
-    { name: 'Tokyo', imageUrl: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=400&q=80' },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
       {/* Hero Section */}
@@ -97,21 +127,21 @@ const Home = () => {
           <p className="mt-2 text-gray-500">Everything you need to get noticed or find talent.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="p-8 bg-white rounded-xl shadow-md text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+          <motion.div variants={cardVariant} className="p-8 bg-white rounded-xl shadow-md text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
             <TrendingUp className="mx-auto text-pink-500 mb-4" size={48} />
             <h3 className="text-xl font-semibold mb-2">Boost Your Career</h3>
             <p className="text-gray-600">Gain visibility with top-tier agencies and brands actively seeking new talent.</p>
-          </div>
-          <div className="p-8 bg-white rounded-xl shadow-md text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+          </motion.div>
+          <motion.div variants={cardVariant} className="p-8 bg-white rounded-xl shadow-md text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
             <ShieldCheck className="mx-auto text-pink-500 mb-4" size={48} />
             <h3 className="text-xl font-semibold mb-2">Safe & Secure</h3>
             <p className="text-gray-600">We verify recruiters to ensure a safe and professional environment for all our models.</p>
-          </div>
-          <div className="p-8 bg-white rounded-xl shadow-md text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+          </motion.div>
+          <motion.div variants={cardVariant} className="p-8 bg-white rounded-xl shadow-md text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
             <Award className="mx-auto text-pink-500 mb-4" size={48} />
             <h3 className="text-xl font-semibold mb-2">Curated Talent</h3>
             <p className="text-gray-600">Recruiters can easily browse our diverse and high-quality catalogue of professional models.</p>
-          </div>
+          </motion.div>
         </div>
       </motion.section>
 
@@ -159,24 +189,41 @@ const Home = () => {
           <h2 className="text-4xl font-bold">Featured Models</h2>
           <p className="mt-2 text-gray-500">A glimpse of the incredible talent on our platform.</p>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredModels.map((model, index) => (
-            <motion.div 
-              key={index} 
-              className="group relative overflow-hidden rounded-xl shadow-lg"
-              variants={cardVariant}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.5 }}
-            >
-              <img src={model.imageUrl} alt={model.name} className="w-full h-96 object-cover transition-transform duration-500 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 p-6">
-                <h3 className="text-2xl font-semibold text-white">{model.name}</h3>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        
+        {loading && (
+          <div className="flex justify-center items-center h-48">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-10 bg-red-50 border border-red-200 rounded-lg">
+            <AlertTriangle className="mx-auto text-red-500" size={40} />
+            <p className="mt-4 text-red-700 font-semibold">{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredModels.map((model) => (
+              <motion.div 
+                key={model.id} 
+                className="group relative overflow-hidden rounded-xl shadow-lg"
+                variants={cardVariant}
+              >
+                <img 
+                  src={`${API_BASE_URL}/uploads/${model.image}`} 
+                  alt={model.name} 
+                  className="w-full h-96 object-cover transition-transform duration-500 group-hover:scale-110 bg-gray-200" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 p-6">
+                  <h3 className="text-2xl font-semibold text-white">{model.name}</h3>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </motion.section>
 
       {/* Testimonials Section */}
