@@ -73,7 +73,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-20">
           
           <NavLink to="/" className="text-3xl font-bold tracking-wider text-white transition-colors duration-300 hover:text-pink-400">
-            Model<span className="text-pink-400">Connect</span>
+             Drippn's<span className="text-pink-400">Studio</span>
           </NavLink>
 
           {/* Desktop Links */}

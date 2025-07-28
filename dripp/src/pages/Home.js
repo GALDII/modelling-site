@@ -179,40 +179,6 @@ const Home = () => {
         </div>
       </motion.section>
 
-      {/* Trending Locations Section */}
-      <motion.section 
-        className="bg-white py-20 px-6"
-        variants={sectionVariant}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold">Trending Destinations</h2>
-            <p className="mt-2 text-gray-500">Discover opportunities in the world's fashion capitals.</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {trendingLocations.map((location) => (
-              <motion.div
-                key={location.name}
-                className="relative h-64 rounded-xl overflow-hidden group shadow-lg"
-                variants={cardVariant}
-                whileHover={{ scale: 1.05 }}
-              >
-                <img src={location.imageUrl} alt={location.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-start p-6">
-                  <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                    <MapPin size={20} />
-                    {location.name}
-                  </h3>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
       {/* Testimonials Section */}
       <motion.section 
         className="bg-pink-500 text-white py-20 px-6"
