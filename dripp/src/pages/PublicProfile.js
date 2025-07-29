@@ -92,7 +92,7 @@ const PublicProfile = () => {
                 <div className="md:flex gap-8 items-center bg-white p-8 rounded-2xl shadow-lg">
                     <div className="md:w-1/3 text-center md:text-left">
                         <img 
-                            src={`https://modelconnect-api.onrender.com/uploads/${profile.image}`}
+                            src={profile.image}
                             alt={profile.name}
                             className={`w-48 h-48 rounded-full mx-auto object-cover ring-4 ${isPhotographer ? 'ring-blue-200' : 'ring-pink-200'}`}
                         />
@@ -113,7 +113,7 @@ const PublicProfile = () => {
                                 </a>
                             )}
                              {profile.instagram_id && (
-                                <a href={`https://instagram.com/${profile.instagram_id}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-800 rounded-lg font-semibold hover:bg-gray-200 transition">
+                                <a href={profile.instagram_id} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-800 rounded-lg font-semibold hover:bg-gray-200 transition">
                                     <Instagram size={18} className="mr-2"/> Instagram
                                 </a>
                             )}
@@ -126,7 +126,7 @@ const PublicProfile = () => {
                     <div className="mt-12 bg-white p-8 rounded-2xl shadow-lg">
                         <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3"><Video size={28}/> Sample Work</h2>
                         <div className="rounded-xl overflow-hidden shadow-inner">
-                            <video src={`https://modelconnect-api.onrender.com/uploads/${profile.sample_video_url}`} controls className="w-full"></video>
+                            <video src={profile.sample_video_url} controls className="w-full"></video>
                         </div>
                     </div>
                 )}
@@ -144,7 +144,7 @@ const PublicProfile = () => {
                                     transition={{ type: 'spring', stiffness: 300 }}
                                 >
                                     <img 
-                                        src={`https://modelconnect-api.onrender.com/uploads/${img.image_url}`}
+                                        src={img.image_url}
                                         alt={`Gallery image for ${profile.name}`}
                                         className="w-full h-full object-cover"
                                     />
