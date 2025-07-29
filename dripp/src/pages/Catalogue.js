@@ -143,7 +143,7 @@ const Catalogue = () => {
                 if (activeTab === 'editors') {
                     return (
                         <motion.div key={item.id} className="bg-white rounded-xl shadow-lg overflow-hidden border">
-                            <div className="relative aspect-video bg-black"><video src={`https://modelconnect-api.onrender.com/uploads/${item.video_url}`} controls className="w-full h-full object-cover"></video></div>
+                            <div className="relative aspect-video bg-black"><video src={item.video_url} controls className="w-full h-full object-cover"></video></div>
                             <div className="p-5">
                                 <h3 className="text-xl font-bold text-gray-900 truncate">{item.title}</h3>
                                 <p className="text-sm font-medium text-gray-500">by {item.editor_name}</p>
@@ -155,7 +155,7 @@ const Catalogue = () => {
                     return (
                          <motion.div key={item.id} className="bg-white rounded-xl shadow-lg group transform hover:-translate-y-2 transition-all duration-300 ease-in-out hover:shadow-2xl border border-transparent hover:border-pink-200">
                             <div className="relative overflow-hidden rounded-t-xl">
-                                <img src={`https://modelconnect-api.onrender.com/uploads/${item.image}`} alt={item.name} className="w-full h-80 object-cover transition-all duration-500 group-hover:scale-110" />
+                                <img src={item.image} alt={item.name} className="w-full h-80 object-cover transition-all duration-500 group-hover:scale-110" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                                 <div className="absolute bottom-0 left-0 p-4 w-full">
                                     <h3 className="text-2xl font-bold text-white tracking-tight">{item.name}</h3>
