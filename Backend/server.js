@@ -216,6 +216,60 @@ app.get('/api/users', verifyToken, restrictTo('admin'), async (req, res) => {
     }
 });
 
+// User Update Route
+app.put('/api/users/:userId', verifyToken, restrictTo('admin'), async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const { name, email, role } = req.body;
+        
+        // Validate input
+        if (!name || !email || !role) {
+            return res.status(400).json({ message: 'All fields are required.' });
+        }
+
+        // Check if email is already used by another user
+        const [existingEmail] = await db.query(
+            'SELECT id FROM users WHERE email = ? AND id != ?',
+            [email, userId]
+        );
+        
+        if (existingEmail.length > 0) {
+            return res.status(409).json({ message: 'Email is already in use by another user.' });
+        }
+
+        // Update user in database
+        await db.query(
+            'UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?',
+            [name, email, role, userId]
+        );
+
+        res.json({ message: 'User updated successfully' });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ message: 'Failed to update user.' });
+    }
+});
+
+// User Delete Route
+app.delete('/api/users/:userId', verifyToken, restrictTo('admin'), async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        
+        // Delete associated data first (models, editor uploads, etc.)
+        await db.query('DELETE FROM models WHERE user_id = ?', [userId]);
+        await db.query('DELETE FROM editor_uploads WHERE user_id = ?', [userId]);
+        await db.query('DELETE FROM model_images WHERE model_id IN (SELECT id FROM models WHERE user_id = ?)', [userId]);
+        
+        // Delete the user
+        await db.query('DELETE FROM users WHERE id = ?', [userId]);
+        
+        res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({ message: 'Failed to delete user.' });
+    }
+});
+
 // ===== CATALOGUE ROUTES =====
 app.get('/api/models', verifyToken, restrictTo('recruiter', 'admin'), async (req, res) => {
   try {
