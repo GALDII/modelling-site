@@ -48,7 +48,7 @@ const EditorDashboard = ({ videos, fetchVideos, showNotification }) => {
                 <motion.div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     {videos.map(video => (
                         <motion.div key={video.id} className="bg-white rounded-xl shadow-lg overflow-hidden border" layout initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring' }}>
-                            <div className="relative aspect-video bg-black"><video src={`https://modelconnect-api.onrender.com/uploads/${video.video_url}`} controls className="w-full h-full object-cover"></video></div>
+                            <div className="relative aspect-video bg-black"><video src={video.video_url} controls className="w-full h-full object-cover"></video></div>
                             <div className="p-5">
                                 <h3 className="text-xl font-bold text-gray-900 truncate">{video.title}</h3>
                                 <p className="text-gray-600 text-sm mt-1 h-10 overflow-hidden">{video.description}</p>
@@ -162,7 +162,7 @@ const CreativeProfile = ({ profile, fetchProfile, showNotification }) => {
                                 <p className="text-gray-800"><strong>Gender:</strong> {profile.gender}</p>
                                 <p className="text-gray-800"><strong>Bio:</strong> {profile.bio}</p>
                                 <p className="text-gray-800"><strong>Portfolio:</strong> <a href={profile.portfolio} target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline break-all">{profile.portfolio}</a></p>
-                                <p className="text-gray-800"><strong>Instagram:</strong> <a href={`https://instagram.com/${profile.instagram_id}`} target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline">@{profile.instagram_id}</a></p>
+                                <p className="text-gray-800"><strong>Instagram:</strong> <a href={profile.instagram_id} target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline">@{profile.instagram_id}</a></p>
                             </>
                         )}
                     </div>
@@ -170,14 +170,14 @@ const CreativeProfile = ({ profile, fetchProfile, showNotification }) => {
                         {profile.role === 'photographer' && profile.sample_video_url && (
                             <>
                                 <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Sample Video</h3>
-                                <div className="rounded-lg overflow-hidden"><video src={`https://modelconnect-api.onrender.com/uploads/${profile.sample_video_url}`} controls className="w-full"></video></div>
+                                <div className="rounded-lg overflow-hidden"><video src={profile.sample_video_url} controls className="w-full"></video></div>
                             </>
                         )}
                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Photo Gallery</h3>
                         <div className="grid grid-cols-3 gap-2">
                           {profile.gallery.map((img) => (
                             <div key={img.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                               <img src={`https://modelconnect-api.onrender.com/uploads/${img.image_url}`} alt={`Gallery`} className="w-full h-full object-cover"/>
+                               <img src={img.image_url} alt={`Gallery`} className="w-full h-full object-cover"/>
                                {profile.image === img.image_url && <div className="absolute top-1 left-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"><Star size={12}/> Main</div>}
                                {isEditing && (
                                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 p-1">
