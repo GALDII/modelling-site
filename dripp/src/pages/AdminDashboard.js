@@ -225,7 +225,7 @@ const AdminDashboard = () => {
                                                     name="name"
                                                     value={editedUser.name}
                                                     onChange={handleEditChange}
-                                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+                                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500 text-black"
                                                 />
                                             ) : (
                                                 <div className="text-sm font-medium text-gray-900">{user.name}</div>
@@ -238,7 +238,7 @@ const AdminDashboard = () => {
                                                     name="email"
                                                     value={editedUser.email}
                                                     onChange={handleEditChange}
-                                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+                                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500 text-black"
                                                 />
                                             ) : (
                                                 <div className="text-sm text-gray-500">{user.email}</div>
@@ -250,7 +250,7 @@ const AdminDashboard = () => {
                                                     name="role"
                                                     value={editedUser.role}
                                                     onChange={handleEditChange}
-                                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+                                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500 text-black"
                                                 >
                                                     <option value="admin">Admin</option>
                                                     <option value="recruiter">Recruiter</option>
