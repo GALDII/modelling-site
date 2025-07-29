@@ -48,7 +48,14 @@ const EditorDashboard = ({ videos, fetchVideos, showNotification }) => {
                 <motion.div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     {videos.map(video => (
                         <motion.div key={video.id} className="bg-white rounded-xl shadow-lg overflow-hidden border" layout initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring' }}>
-                            <div className="relative aspect-video bg-black"><video src={video.video_url} controls className="w-full h-full object-cover"></video></div>
+                            <div className="relative aspect-video bg-black">
+                                <video 
+                                    src={video.video_url} 
+                                    controls 
+                                    className="w-full h-full object-cover"
+                                    poster="https://placehold.co/600x400?text=Video+Loading"
+                                />
+                            </div>
                             <div className="p-5">
                                 <h3 className="text-xl font-bold text-gray-900 truncate">{video.title}</h3>
                                 <p className="text-gray-600 text-sm mt-1 h-10 overflow-hidden">{video.description}</p>
@@ -142,27 +149,146 @@ const CreativeProfile = ({ profile, fetchProfile, showNotification }) => {
     return (
         <form onSubmit={handleSave}>
             <div className="relative h-48 bg-gradient-to-r from-pink-50 to-rose-100">
-                <div className="absolute -bottom-16 left-8"><div className="w-32 h-32 rounded-full ring-4 ring-white bg-gray-200 flex items-center justify-center overflow-hidden"><img src={profile.image} alt="Profile" className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://placehold.co/128x128/e2e8f0/4a5568?text=N/A'; }} /></div></div>
-                <div className="absolute top-4 right-4">{!isEditing ? (<button type="button" onClick={handleEdit} className="flex items-center gap-2 bg-white text-gray-700 px-4 py-2 rounded-lg font-semibold shadow hover:bg-gray-100 transition"><Edit size={16} /> Edit Profile</button>) : (<div className="flex gap-2"><button type="submit" disabled={isSubmitting} className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-green-600 transition disabled:bg-green-300">{isSubmitting ? <Loader className="animate-spin" size={16}/> : <Save size={16}/>} Save</button><button type="button" onClick={handleCancel} className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-gray-600 transition"><X size={16} /> Cancel</button></div>)}</div>
+                <div className="absolute -bottom-16 left-8">
+                    <div className="w-32 h-32 rounded-full ring-4 ring-white bg-gray-200 flex items-center justify-center overflow-hidden">
+                        <img 
+                            src={profile.image} 
+                            alt="Profile" 
+                            className="w-full h-full object-cover" 
+                            onError={(e) => { 
+                                e.target.onerror = null;
+                                e.target.src = 'https://placehold.co/128x128/e2e8f0/4a5568?text=N/A'; 
+                            }} 
+                        />
+                    </div>
+                </div>
+                <div className="absolute top-4 right-4">
+                    {!isEditing ? (
+                        <button 
+                            type="button" 
+                            onClick={handleEdit} 
+                            className="flex items-center gap-2 bg-white text-gray-700 px-4 py-2 rounded-lg font-semibold shadow hover:bg-gray-100 transition"
+                        >
+                            <Edit size={16} /> Edit Profile
+                        </button>
+                    ) : (
+                        <div className="flex gap-2">
+                            <button 
+                                type="submit" 
+                                disabled={isSubmitting} 
+                                className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-green-600 transition disabled:bg-green-300"
+                            >
+                                {isSubmitting ? <Loader className="animate-spin" size={16}/> : <Save size={16}/>} Save
+                            </button>
+                            <button 
+                                type="button" 
+                                onClick={handleCancel} 
+                                className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-gray-600 transition"
+                            >
+                                <X size={16} /> Cancel
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
             <div className="pt-20 p-8 space-y-8">
-                <div>{isEditing ? <input type="text" name="name" value={formData.name || ''} onChange={handleChange} className="text-4xl font-bold text-gray-800 border-b-2 border-gray-300 focus:border-pink-500 outline-none w-full" /> : <h1 className="text-4xl font-bold text-gray-800">{profile.name}</h1>}</div>
+                <div>
+                    {isEditing ? (
+                        <input 
+                            type="text" 
+                            name="name" 
+                            value={formData.name || ''} 
+                            onChange={handleChange} 
+                            className="text-4xl font-bold text-gray-800 border-b-2 border-gray-300 focus:border-pink-500 outline-none w-full" 
+                        />
+                    ) : (
+                        <h1 className="text-4xl font-bold text-gray-800">{profile.name}</h1>
+                    )}
+                </div>
                 <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-4">
                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Details</h3>
                         {isEditing ? (
                             <>
-                                <div className="space-y-2"><label className="font-medium text-gray-700">Gender</label><select name="gender" value={formData.gender || ''} onChange={handleChange} className="p-2 rounded-lg bg-gray-100 w-full text-gray-800"><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
-                                <div className="space-y-2"><label className="font-medium text-gray-700">Bio</label><textarea name="bio" value={formData.bio || ''} onChange={handleChange} className="p-2 rounded-lg bg-gray-100 w-full min-h-[120px] text-gray-800"/></div>
-                                <div className="space-y-2"><label className="font-medium text-gray-700">Portfolio URL</label><input type="url" name="portfolio" value={formData.portfolio || ''} onChange={handleChange} className="p-2 rounded-lg bg-gray-100 w-full text-gray-800" placeholder="https://your-link.com"/></div>
-                                <div className="space-y-2"><label className="font-medium text-gray-700">Instagram Handle</label><input type="text" name="instagram_id" value={formData.instagram_id || ''} onChange={handleChange} className="p-2 rounded-lg bg-gray-100 w-full text-gray-800" placeholder="yourhandle"/></div>
+                                <div className="space-y-2">
+                                    <label className="font-medium text-gray-700">Gender</label>
+                                    <select 
+                                        name="gender" 
+                                        value={formData.gender || ''} 
+                                        onChange={handleChange} 
+                                        className="p-2 rounded-lg bg-gray-100 w-full text-gray-800"
+                                    >
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="font-medium text-gray-700">Bio</label>
+                                    <textarea 
+                                        name="bio" 
+                                        value={formData.bio || ''} 
+                                        onChange={handleChange} 
+                                        className="p-2 rounded-lg bg-gray-100 w-full min-h-[120px] text-gray-800"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="font-medium text-gray-700">Portfolio URL</label>
+                                    <input 
+                                        type="url" 
+                                        name="portfolio" 
+                                        value={formData.portfolio || ''} 
+                                        onChange={handleChange} 
+                                        className="p-2 rounded-lg bg-gray-100 w-full text-gray-800" 
+                                        placeholder="https://your-link.com"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="font-medium text-gray-700">Instagram Handle</label>
+                                    <input 
+                                        type="text" 
+                                        name="instagram_id" 
+                                        value={formData.instagram_id || ''} 
+                                        onChange={handleChange} 
+                                        className="p-2 rounded-lg bg-gray-100 w-full text-gray-800" 
+                                        placeholder="yourhandle"
+                                    />
+                                </div>
                             </>
                         ) : (
                             <>
                                 <p className="text-gray-800"><strong>Gender:</strong> {profile.gender}</p>
                                 <p className="text-gray-800"><strong>Bio:</strong> {profile.bio}</p>
-                                <p className="text-gray-800"><strong>Portfolio:</strong> <a href={profile.portfolio} target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline break-all">{profile.portfolio}</a></p>
-                                <p className="text-gray-800"><strong>Instagram:</strong> <a href={profile.instagram_id} target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:underline">@{profile.instagram_id}</a></p>
+                                <p className="text-gray-800">
+                                    <strong>Portfolio:</strong> 
+                                    {profile.portfolio ? (
+                                        <a 
+                                            href={profile.portfolio.startsWith('http') ? profile.portfolio : `https://${profile.portfolio}`} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="text-pink-500 hover:underline break-all ml-1"
+                                        >
+                                            {profile.portfolio}
+                                        </a>
+                                    ) : (
+                                        <span className="text-gray-400 ml-1">Not provided</span>
+                                    )}
+                                </p>
+                                <p className="text-gray-800">
+                                    <strong>Instagram:</strong> 
+                                    {profile.instagram_id ? (
+                                        <a 
+                                            href={`https://instagram.com/${profile.instagram_id}`} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="text-pink-500 hover:underline ml-1"
+                                        >
+                                            @{profile.instagram_id}
+                                        </a>
+                                    ) : (
+                                        <span className="text-gray-400 ml-1">Not provided</span>
+                                    )}
+                                </p>
                             </>
                         )}
                     </div>
@@ -170,34 +296,79 @@ const CreativeProfile = ({ profile, fetchProfile, showNotification }) => {
                         {profile.role === 'photographer' && profile.sample_video_url && (
                             <>
                                 <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Sample Video</h3>
-                                <div className="rounded-lg overflow-hidden"><video src={profile.sample_video_url} controls className="w-full"></video></div>
+                                <div className="rounded-lg overflow-hidden">
+                                    <video 
+                                        src={profile.sample_video_url} 
+                                        controls 
+                                        className="w-full"
+                                        poster="https://placehold.co/600x400?text=Video+Loading"
+                                    />
+                                </div>
                             </>
                         )}
                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Photo Gallery</h3>
                         <div className="grid grid-cols-3 gap-2">
                           {profile.gallery.map((img) => (
                             <div key={img.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                               <img src={img.image_url} alt={`Gallery`} className="w-full h-full object-cover"/>
-                               {profile.image === img.image_url && <div className="absolute top-1 left-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1"><Star size={12}/> Main</div>}
+                               <img 
+                                 src={img.image_url} 
+                                 alt={`Gallery`} 
+                                 className="w-full h-full object-cover"
+                                 onError={(e) => {
+                                   e.target.onerror = null;
+                                   e.target.src = 'https://placehold.co/600x400?text=Image+Not+Found';
+                                 }}
+                               />
+                               {profile.image === img.image_url && (
+                                 <div className="absolute top-1 left-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                                   <Star size={12}/> Main
+                                 </div>
+                               )}
                                {isEditing && (
                                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 p-1">
-                                   {profile.image !== img.image_url && <button type="button" onClick={() => handleSetMainImage(img.image_url)} className="text-xs bg-green-500 text-white px-2 py-1 rounded w-full hover:bg-green-600">Set Main</button>}
-                                   <button type="button" onClick={() => handleDeleteExistingImage(img.id)} className="text-xs bg-red-500 text-white px-2 py-1 rounded w-full hover:bg-red-600">Delete</button>
+                                   {profile.image !== img.image_url && (
+                                     <button 
+                                       type="button" 
+                                       onClick={() => handleSetMainImage(img.image_url)} 
+                                       className="text-xs bg-green-500 text-white px-2 py-1 rounded w-full hover:bg-green-600"
+                                     >
+                                       Set Main
+                                     </button>
+                                   )}
+                                   <button 
+                                     type="button" 
+                                     onClick={() => handleDeleteExistingImage(img.id)} 
+                                     className="text-xs bg-red-500 text-white px-2 py-1 rounded w-full hover:bg-red-600"
+                                   >
+                                     Delete
+                                   </button>
                                  </div>
                                )}
                             </div>
                           ))}
                           {galleryPreviews.map((preview, index) => (
                             <div key={index} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                               <img src={preview} alt={`Preview`} className="w-full h-full object-cover"/>
-                               <button type="button" onClick={() => handleRemoveNewFile(index)} className="absolute top-1 right-1 bg-red-500/80 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"><Trash2 size={14}/></button>
+                               <img src={preview} alt={`Preview`} className="w-full h-full object-cover" />
+                               <button 
+                                 type="button" 
+                                 onClick={() => handleRemoveNewFile(index)} 
+                                 className="absolute top-1 right-1 bg-red-500/80 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+                               >
+                                 <Trash2 size={14}/>
+                               </button>
                             </div>
                           ))}
                           {isEditing && (profile.gallery.length + galleryFiles.length) < 8 && (
                             <label className="aspect-square flex flex-col items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 transition">
                               <ImagePlus className="text-gray-400" size={24}/>
                               <span className="text-xs text-gray-500 mt-1">Add Photos</span>
-                              <input type="file" className="sr-only" multiple accept="image/*" onChange={handleGalleryFileChange}/>
+                              <input 
+                                type="file" 
+                                className="sr-only" 
+                                multiple 
+                                accept="image/*" 
+                                onChange={handleGalleryFileChange}
+                              />
                             </label>
                           )}
                        </div>
@@ -220,20 +391,38 @@ const Profile = () => {
   const fetchCreativeProfile = useCallback(async () => {
     if (!token) return;
     try {
-      const res = await fetch('https://modelconnect-api.onrender.com/api/models/my-profile', { headers: { Authorization: `Bearer ${token}` } });
-      if (res.status === 404) setProfile(null);
-      else if (res.ok) setProfile(await res.json());
-      else throw new Error('Could not fetch profile.');
-    } catch (error) { showNotification(error.message, 'error'); }
+      const res = await fetch('https://modelconnect-api.onrender.com/api/models/my-profile', { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      
+      if (res.status === 404) {
+        setProfile(null);
+      } else if (res.ok) {
+        const data = await res.json();
+        setProfile(data);
+      } else {
+        throw new Error('Could not fetch profile.');
+      }
+    } catch (error) { 
+      showNotification(error.message, 'error'); 
+    }
   }, [token, showNotification]);
 
   const fetchEditorVideos = useCallback(async () => {
     if (!token) return;
     try {
-      const res = await fetch('https://modelconnect-api.onrender.com/api/editor/my-videos', { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) setEditorVideos(await res.json());
-      else throw new Error('Could not fetch videos.');
-    } catch (error) { showNotification(error.message, 'error'); }
+      const res = await fetch('https://modelconnect-api.onrender.com/api/editor/my-videos', { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      
+      if (res.ok) {
+        setEditorVideos(await res.json());
+      } else {
+        throw new Error('Could not fetch videos.');
+      }
+    } catch (error) { 
+      showNotification(error.message, 'error'); 
+    }
   }, [token, showNotification]);
 
   useEffect(() => {
@@ -246,31 +435,67 @@ const Profile = () => {
         }
         setIsLoading(false);
     };
-    if(user) loadData();
-    else setIsLoading(false); // If no user, stop loading
+    
+    if(user) {
+        loadData();
+    } else {
+        setIsLoading(false); // If no user, stop loading
+    }
   }, [user, fetchCreativeProfile, fetchEditorVideos]);
 
-  if (isLoading) return <div className="min-h-screen bg-gray-50 flex justify-center items-center"><Loader className="animate-spin text-pink-500" size={48} /></div>;
+  if (isLoading) return (
+    <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+      <Loader className="animate-spin text-pink-500" size={48} />
+    </div>
+  );
 
   // Render correct dashboard based on role
   return (
     <>
       <AnimatePresence>
-        {notification && <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className={`fixed top-24 right-5 z-50 flex items-center p-4 rounded-lg shadow-lg text-white ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}><CheckCircle className="mr-3" />{notification.message}</motion.div>}
+        {notification && (
+          <motion.div 
+            initial={{ opacity: 0, y: -50 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: 50 }} 
+            className={`fixed top-24 right-5 z-50 flex items-center p-4 rounded-lg shadow-lg text-white ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}
+          >
+            <CheckCircle className="mr-3" />
+            {notification.message}
+          </motion.div>
+        )}
       </AnimatePresence>
+      
       <div className="min-h-screen bg-gray-50">
-        <motion.div className="max-w-7xl mx-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <motion.div 
+          className="max-w-7xl mx-auto" 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }}
+        >
             {user?.role === 'editor' ? (
-                <EditorDashboard videos={editorVideos} fetchVideos={fetchEditorVideos} showNotification={showNotification} />
+                <EditorDashboard 
+                  videos={editorVideos} 
+                  fetchVideos={fetchEditorVideos} 
+                  showNotification={showNotification} 
+                />
             ) : user?.role === 'model' || user?.role === 'photographer' ? (
                 profile ? (
-                    <CreativeProfile profile={profile} fetchProfile={fetchCreativeProfile} showNotification={showNotification} />
+                    <CreativeProfile 
+                      profile={profile} 
+                      fetchProfile={fetchCreativeProfile} 
+                      showNotification={showNotification} 
+                    />
                 ) : (
                     <div className="min-h-screen flex flex-col justify-center items-center text-center p-6">
                         <UserPlus className="mx-auto text-pink-500 mb-4" size={64} />
                         <h2 className="mt-4 text-3xl font-bold text-gray-800">Your Profile Awaits!</h2>
                         <p className="text-gray-600 my-4 max-w-md">Create your professional profile now to be discovered.</p>
-                        <Link to="/upload" className="inline-flex items-center justify-center px-8 py-3 bg-pink-600 text-white rounded-lg font-semibold shadow-lg hover:bg-pink-700">Create Your Profile</Link>
+                        <Link 
+                          to="/upload" 
+                          className="inline-flex items-center justify-center px-8 py-3 bg-pink-600 text-white rounded-lg font-semibold shadow-lg hover:bg-pink-700"
+                        >
+                          Create Your Profile
+                        </Link>
                     </div>
                 )
             ) : (
@@ -278,7 +503,12 @@ const Profile = () => {
                     <AlertTriangle className="mx-auto text-yellow-500 mb-4" size={64} />
                     <h2 className="mt-4 text-3xl font-bold text-gray-800">Dashboard Not Applicable</h2>
                     <p className="text-gray-600 my-4 max-w-md">Your role does not have a dedicated dashboard view.</p>
-                    <Link to="/" className="inline-flex items-center justify-center px-8 py-3 bg-gray-600 text-white rounded-lg font-semibold shadow-lg hover:bg-gray-700">Return to Home</Link>
+                    <Link 
+                      to="/" 
+                      className="inline-flex items-center justify-center px-8 py-3 bg-gray-600 text-white rounded-lg font-semibold shadow-lg hover:bg-gray-700"
+                    >
+                      Return to Home
+                    </Link>
                  </div>
             )}
         </motion.div>
